@@ -102,4 +102,7 @@
     border-radius: 0;
     background: rgb(56, 122, 209);
   }
+  .ant-progress-text {
+    color: rgb(15, 72, 194);
+  }
 </style>

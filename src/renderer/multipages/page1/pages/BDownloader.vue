@@ -19,6 +19,7 @@
         <a-pagination style="margin-top: 10px;" @change="changePage" v-model="current" :pageSize=20 :total="bookmark_count" show-less-items></a-pagination>
       </div>
     </div>
+    <!-- 收藏夹下载的Drawer -->
     <a-drawer class="show-image" :width="700" :visible="isShowImage" @close="closeImageDrawer" :closable="false">
       <img class="big-cover" :src="itemContent.cover" alt="">
       <p class="detail-title">标题：{{ itemContent.title }}</p>
@@ -77,6 +78,51 @@
         </a-drawer>
       </a-drawer>
     </a-drawer>
+    <!-- 根据AVorBV号获取视频下载 -->
+    <div class="av-bv">
+      <div class="area-title">
+        <a-tag color="#108ee9" style="font-size: 15px;padding:5px 5px;">AV/BV号获取</a-tag>
+        <div class="av-bv-input">
+          <a-input-search v-model="inputAv" placeholder="这里输入AV号" enterButton style="width: 200px" @search="searchByAvOrBv('av')" />
+          <a-input-search v-model="inputBv" placeholder="这里输入BV号" enterButton style="width: 200px" @search="searchByAvOrBv('bv')" />
+        </div>
+      </div>
+      <div class="av-bv-main-area">
+        <div class="video-pages">
+          <div class="video-page" v-for="(item, index) in searchData.pages" :key="index">
+            <a-tooltip placement="right">
+              <template slot="title">
+                <span>{{ item.part }}</span>
+              </template>
+              {{ item.part }}
+            </a-tooltip>
+          </div>
+        </div>
+        <div class="av-bv-download-area">
+          <p class="av-bv-current-title">
+            <a-tooltip placement="left">
+              <template slot="title">
+                <span>{{ searchData.title }}</span>
+              </template>
+              标题：{{ searchData.title }}
+            </a-tooltip>
+          </p>
+          <div class="single-download">
+            <a-tag color="blue" style="font-size: 13px;padding:5px 5px;">单p下载</a-tag>
+            <div class="download-progress">
+              <p>视频下载进度：</p>
+              <a-progress :percent="idVideoProgress"></a-progress>
+              <p>音频下载进度：（Dash模式）</p>
+              <a-progress :percent="idAudioProgress"></a-progress>
+            </div>
+          </div>
+          <div class="multi-download">
+            <a-tag color="blue" style="font-size: 13px;padding:5px 5px;">多p下载（全部下载）</a-tag>
+            <a-button style="display:block;margin-top: 15px;margin-left: 20px;">全部下载</a-button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -122,6 +168,11 @@ export default {
       allHasDownload: [], // 全部下载的已经下载完毕的名称数组
       allDownloadingName: '', // 全部下载的正在下载的分p名
       allProgress: 0, // 全部下载的总下载进度
+      inputAv: '', // 输入的Av号
+      inputBv: '', // 输入的Bv号
+      searchData: {}, // 根据av或bv查询的返回结果
+      idVideoProgress: 0, // av或bv模式下的视频下载进度
+      idAudioProgress: 0, // av或bv模式下的音频下载进度
     }
   },
   methods: {
@@ -382,6 +433,22 @@ export default {
     },
     openHasDownloadFilePath () { // 打开已下载文件所在文件夹
       shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.itemContent.title.replace(/\s*/g,"")}`)
+    },
+    async searchByAvOrBv (type) { // 通过AV号获取视频信息及下载链接
+      let resData = {}
+      if (type == 'av') { // 输入为av号
+        resData = await this.$http({
+          method: 'GET',
+          url: '/api/x/web-interface/view?aid='+this.inputAv
+        })
+      } else if (type == 'bv') { // 输入为bv号
+        resData = await this.$http({
+          method: 'GET',
+          url: '/api/x/web-interface/view?bvid='+this.inputBv
+        })
+      }
+      this.searchData = resData.data.data
+      console.log(resData)
     }
   },
   created () {
@@ -416,6 +483,19 @@ export default {
   width: 100%;
   height: calc(100vh - 30px);
   overflow: auto;
+}
+.BDownloader-container::-webkit-scrollbar {
+  width: 5px;
+  height: 1px;
+}
+.BDownloader-container::-webkit-scrollbar-thumb { /* 滚动条中的滑条 */
+  border-radius: 0;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+  background: #1d518b;
+}
+.BDownloader-container::-webkit-scrollbar-track { /* 滚动条轨迹 */
+  border-radius: 0;
+  background: rgb(56, 122, 209);
 }
 .area-title {
   color: rgb(73, 218, 170);
@@ -508,5 +588,75 @@ export default {
 }
 .all-has-download {
   color: rgb(189, 64, 33);
+}
+.av-bv {
+  width: 100%;
+  /* height: 300px; */
+}
+.av-bv-main-area {
+  width: 100%;
+  height: 300px;
+  margin-top: 10px;
+  border-bottom: 1px solid rgb(50, 95, 190);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.video-pages {
+  height: 300px;
+  overflow: auto;
+  width: 200px;
+}
+.video-pages::-webkit-scrollbar {
+  width: 2px;
+  height: 1px;
+}
+.video-pages::-webkit-scrollbar-thumb { /* 滚动条中的滑条 */
+  border-radius: 0;
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
+  background: #1d518b;
+}
+.video-pages::-webkit-scrollbar-track { /* 滚动条轨迹 */
+  border-radius: 0;
+  background: rgb(56, 122, 209);
+}
+.video-page {
+  color: rgb(53, 206, 185);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  width: 200px;
+}
+.video-page:hover {
+  color: rgb(47, 101, 218);
+}
+.av-bv-download-area {
+  height: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* justify-content: center; */
+  width: calc(100% - 200px);
+  margin-left: 5px;
+}
+.av-bv-current-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 200px;
+  font-size: 15px;
+  color: rgb(48, 104, 207);
+  margin: 0 auto;
+}
+.download-progress {
+  margin-top: 10px;
+  color: rgb(31, 74, 218);
+}
+.multi-download {
+  margin-top: 10px;
 }
 </style>
