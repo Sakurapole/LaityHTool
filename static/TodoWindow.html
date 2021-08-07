@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+    <style scoped>
+        html {
+            height: 100%;
+            /* overflow: hidden; */
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgba(46, 46, 46, 0.562);
+            /* background: url('../src/main/L.png'); */
+            -webkit-app-region: drag;
+            height: 100%;
+        }
+        #todo-container {
+            width: 100%;
+            height: 90vh;
+            position: absolute;
+            top: 0;
+            overflow: auto;
+            -webkit-app-region: no-drag;
+        }
+        #todo-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .todo-item {
+            margin-left: 10px;
+        }
+        .todo-title {
+            color: rgba(122, 230, 221, 0.8);
+            text-shadow: 2px 2px 2px rgba(58, 185, 235, 0.2);
+        }
+        .func-btns {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 250px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+        #lock, #unlock, #close, #reload {
+            -webkit-app-region: no-drag;
+            cursor: pointer;
+        }
+        :is(#lock, #unlock, #close, #reload):hover {
+            background-color: rgb(65, 65, 65);
+        }
+        .urgent {
+            color: red;
+        }
+        .day-plan {
+            color: rgb(3, 110, 233);
+        }
+        .week-plan {
+            color: rgb(0, 38, 255);
+        }
+        .no-urgent {
+            color: rgb(80, 248, 103);
+        }
+    </style>
+</head>
+<body>
+    <div id="todo-container">
+    </div>
+    <div class="func-btns">
+        <svg t="1627803075611" id="reload" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3675" width="32" height="32"><path d="M807.9 480.63A20 20 0 0 1 788 461.8c-0.05-0.73-3.31-47.62-32-99.2-38.06-68.46-101.08-112.89-187.31-132-85.8-19.07-167.33 4.69-242.35 70.63-57.48 50.53-89.33 108-89.64 108.59a20 20 0 0 1-35.11-19.16c1.4-2.57 35-63.44 97.39-118.63 37.07-32.78 76.69-56.74 117.75-71.23 51.87-18.3 105.92-21.42 160.64-9.25 54 12 100.79 33.47 139.12 63.81a293.11 293.11 0 0 1 75.41 89.55c32.57 59.47 35.9 112.42 36 114.64A20 20 0 0 1 809 480.6z" p-id="3676" fill="#1296db"></path><path d="M411.49 434.29H205.93a20 20 0 0 1-20-20V199.7a20 20 0 0 1 40 0v194.59h185.56a20 20 0 0 1 0 40z" p-id="3677" fill="#1296db"></path><path d="M516.61 832.25a311.22 311.22 0 0 1-67.67-7.62c-53.78-12-100.39-32.46-138.54-60.91A282.73 282.73 0 0 1 235.1 680c-32.65-55.61-35.82-104.85-35.94-106.92a20 20 0 0 1 39.93-2.36c0.06 0.8 3.19 43.35 31.46 90.64 37.81 63.23 100.75 105 187.08 124.24 85.74 19.07 164.91-2.49 235.32-64.1 53.89-47.15 82.24-101.22 82.52-101.76A20 20 0 0 1 811 638.07c-1.26 2.44-31.49 60.44-90.68 112.6-35.13 31-73.23 53.46-113.25 66.86a283.45 283.45 0 0 1-90.46 14.72z" p-id="3678" fill="#1296db"></path><path d="M818.07 844.3a20 20 0 0 1-20-20V629.71H605.74a20 20 0 0 1 0-40h212.33a20 20 0 0 1 20 20V824.3a20 20 0 0 1-20 20z" p-id="3679" fill="#1296db"></path></svg>
+        <svg t="1627801967369" id="close" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2721" width="32" height="32"><path d="M831.632761 244.00634 765.925247 178.299849 503.095189 441.128883 240.265132 178.299849 174.558641 244.00634 437.387675 506.836397 174.558641 769.666454 240.265132 835.373968 503.095189 572.543911 765.925247 835.373968 831.632761 769.666454 568.802704 506.836397Z" p-id="2722" fill="#1296db"></path></svg>
+        <svg t="1627784982950" id="lock" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3801" width="32" height="32"><path d="M507.050667 170.666667c85.546667 0 155.178667 61.696 155.178666 137.514666v92.544H351.872V308.181333C351.872 232.362667 421.546667 170.666667 507.050667 170.666667m276.309333 407.978666a21.333333 21.333333 0 0 0 21.333333-21.333333V499.157333c0-52.010667-44.245333-94.293333-99.797333-97.792V308.181333C704.896 208.810667 616.149333 128 507.050667 128 397.952 128 309.205333 208.810667 309.205333 308.181333v93.013334C252.629333 403.669333 207.36 446.464 207.36 499.157333v255.701334C207.36 809.173333 255.317333 853.333333 314.24 853.333333h383.488C756.693333 853.333333 804.693333 809.173333 804.693333 754.858667v-69.546667a21.333333 21.333333 0 0 0-42.666666 0v69.546667c0 30.805333-28.842667 55.808-64.298667 55.808H314.24C278.826667 810.666667 250.026667 785.664 250.026667 754.858667V499.157333c0-30.762667 28.8-55.765333 64.213333-55.765333h383.488c35.456 0 64.298667 25.002667 64.298667 55.765333v58.154667a21.333333 21.333333 0 0 0 21.333333 21.333333" p-id="3802" fill="#1296db"></path></svg>        
+        <svg t="1627785046888" id="unlock" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4361" width="32" height="32"><path d="M810.666667 557.312v-58.154667c0-54.272-48-98.432-106.965334-98.432H357.888V308.181333C357.888 232.362667 427.52 170.666667 513.024 170.666667c85.546667 0 155.178667 61.696 155.178667 137.514666v18.005334a21.333333 21.333333 0 1 0 42.666666 0v-18.005334c0-99.370667-88.746667-180.181333-197.845333-180.181333-109.056 0-197.802667 80.810667-197.802667 180.181333v93.013334C258.645333 403.669333 213.333333 446.464 213.333333 499.157333v255.701334C213.333333 809.173333 261.290667 853.333333 320.256 853.333333h383.445333C762.666667 853.333333 810.666667 809.173333 810.666667 754.858667v-69.546667a21.333333 21.333333 0 0 0-42.666667 0v69.546667c0 30.805333-28.842667 55.808-64.298667 55.808H320.256C284.842667 810.666667 256 785.664 256 754.858667v-255.701334c0-30.762667 28.842667-55.765333 64.256-55.765333h383.445333c35.456 0 64.298667 25.002667 64.298667 55.765333v58.154667a21.333333 21.333333 0 0 0 42.666667 0z" p-id="4362" fill="#1296db"></path></svg>
+    </div>
+
+    <script>
+        const fs = require("fs")
+        const path = require("path")
+        const { remote, ipcRenderer } = require('electron')
+        let win = remote.getCurrentWindow() // 获取当前窗口
+
+        let allData;
+        var body = document.getElementsByTagName('body')[0]
+        var todoContainer = document.getElementById('todo-container') // 获取主容器
+        var lock = document.getElementById('lock')
+        var unlock = document.getElementById('unlock')
+        var close = document.getElementById('close')
+        var reload = document.getElementById('reload')
+
+        ipcRenderer.on('sendTodoSettings', (e, options) => {
+            if (options) {
+                options = JSON.parse(options)
+                body.setAttribute('style', 'background:' + options.bgColor + ';')
+            }
+        })
+
+        lock.setAttribute('style', 'display: none') // 设置上锁按钮不显示
+
+        unlock.addEventListener('click', () => { // 解锁按钮点击事件
+            unlock.setAttribute('style', 'display: none')
+            lock.removeAttribute('style')
+            win.setIgnoreMouseEvents(true)
+        })
+
+        lock.addEventListener('click', () => { // 上锁按钮点击事件
+            lock.setAttribute('style', 'display: none')
+            unlock.removeAttribute('style')
+            win.setIgnoreMouseEvents(false)
+        })
+
+        unlock.addEventListener('mouseenter', () => {
+            console.log("enter")
+            win.setIgnoreMouseEvents(false)
+        })
+
+        lock.addEventListener('mouseenter', () => {
+            console.log("enter")
+            win.setIgnoreMouseEvents(false)
+        })
+        lock.addEventListener('mouseleave', () => {
+            win.setIgnoreMouseEvents(true, { forward: true })
+        })
+
+        close.addEventListener('click', () => {
+            ipcRenderer.send('closeTodoWindow')
+        })
+
+        reload.addEventListener('click', () => {
+            let childItems = document.getElementsByClassName('todo-item') // 获取所有的旧item
+            console.log(childItems)
+            fs.readFileSync(dataPath, (err, data) => {
+                console.log(JSON.parse(data))
+                allData = JSON.parse(data)
+                for (let j = 0; j < childItems.length; j++) {
+                    console.log(todoContainer.childNodes[parseInt(j)])
+                    if (todoContainer.childNodes[parseInt(j)]) {
+                        todoContainer.removeChild(todoContainer.childNodes[parseInt(j)])
+                    }
+                }
+                for (let i in allData.data.will) {
+                    console.log(i)
+                    todoContainer.innerHTML += "<div class='todo-item'><p class='todo-title'>" + (parseInt(i) + 1) + '. ' + allData.data.will[i].title + "</p></div>"
+                }
+            })
+        })
+
+        var dataPath = path.join(__dirname, '../src/renderer/assets/dataDir/todo.json') // 数据读取路径
+        function readFromFile(dataPath) {
+            fs.readFile(dataPath, (err, data) => {
+                console.log(JSON.parse(data))
+                allData = JSON.parse(data)
+                for (let i in allData.data.will) {
+                    console.log(i)
+                    if (allData.data.will[i].conditionStatus == "紧急") {
+                        todoContainer.innerHTML += "<div class='todo-item'><p class='todo-title urgent'>" + (parseInt(i) + 1) + '. ' + allData.data.will[i].title + '   ' + allData.data.will[i].conditionStatus + "</p></div>"
+                    } else if (allData.data.will[i].conditionStatus == "当日") {
+                        todoContainer.innerHTML += "<div class='todo-item'><p class='todo-title day-plan'>" + (parseInt(i) + 1) + '. ' + allData.data.will[i].title + '   ' + allData.data.will[i].conditionStatus + "</p></div>"
+                    } else if (allData.data.will[i].conditionStatus == "本周") {
+                        todoContainer.innerHTML += "<div class='todo-item'><p class='todo-title week-plan'>" + (parseInt(i) + 1) + '. ' + allData.data.will[i].title + '   ' + allData.data.will[i].conditionStatus + "</p></div>"
+                    } else if (allData.data.will[i].conditionStatus == "不急") {
+                        todoContainer.innerHTML += "<div class='todo-item'><p class='todo-title no-urgent'>" + (parseInt(i) + 1) + '. ' + allData.data.will[i].title + '   ' + allData.data.will[i].conditionStatus + "</p></div>"
+                    }
+                }
+            })
+        }
+        readFromFile(dataPath)
+    </script>
+</body>
+</html>
