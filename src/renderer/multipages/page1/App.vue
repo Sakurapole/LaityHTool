@@ -89,4 +89,17 @@
   .ant-menu-item {
     color: rgb(168, 166, 166);
   }
+  .ant-modal-wrap::-webkit-scrollbar {
+    width: 2px;
+    height: 1px;
+  }
+  .ant-modal-wrap::-webkit-scrollbar-thumb { /* 滚动条中的滑条 */
+    border-radius: 0;
+    box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
+    background: #1d518b;
+  }
+  .ant-modal-wrap::-webkit-scrollbar-track { /* 滚动条轨迹 */
+    border-radius: 0;
+    background: rgb(56, 122, 209);
+  }
 </style>

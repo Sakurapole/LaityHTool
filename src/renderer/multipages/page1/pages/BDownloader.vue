@@ -29,6 +29,28 @@
       <!-- 下载Drawer -->
       <a-drawer title="下载界面" class="show-download" :width="300" :visible="isShowDownload" @close="closeDownloadDrawer">
         <a-button @click="downloadAll" type="primary" class="download-all-btn">全部下载</a-button>
+        <a-modal title="选择清晰度（为所有视频共用，目前只支持Dash模式）" v-model="isShowSelectModal" :footer="null">
+          <a-spin :spinning="allSelectLoading">
+            <div class="all-quality" v-for="(item, index) in allQuality" :key="index">
+              <p class="all-quality-name" @click="allSelectQuality(item.code)">{{ item.name }}</p>
+            </div>
+          </a-spin>
+        </a-modal>
+        <a-modal title="全部下载进度" v-model="isShowAllDownload" :footer="null">
+          <p class="all-downloading-name">当前下载分p：{{ allDownloadingName }}</p>
+          <div class="all-progress-area">
+            <p>当前视频下载进度：</p>
+            <a-progress :percent="allVideoProgress"></a-progress>
+            <p>当前音频下载进度：</p>
+            <a-progress :percent="allAudioProgress"></a-progress>
+            <p>总下载进度：</p>
+            <a-progress :percent="allProgress"></a-progress>
+          </div>
+          <a-button @click.native="openHasDownloadFilePath" type="primary">打开已下载文件所在文件夹</a-button>
+          <div class="all-has-download-area" style="height: 300px; overflow: auto;">
+            <p class="all-has-download" v-for="(item, index) in allHasDownload" :key="index">{{ item }}</p>
+          </div>
+        </a-modal>
         <div class="download-page-box">
           <div @click="openDownloadDetail(item)" class="download-page" v-for="(item, index) in allDownloads" :key="index">
             {{ item.part ? item.part : '默认' }}
@@ -51,6 +73,7 @@
               <a-progress :percent="audioProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
             </div>
           </div>
+          <a-button @click.native="openHasDownloadFilePath" type="primary">打开已下载文件所在文件夹</a-button>
         </a-drawer>
       </a-drawer>
     </a-drawer>
@@ -61,7 +84,7 @@
 const fs = require("fs")
 const path = require("path")
 const childProcess = require("child_process")
-const { ipcRenderer } = require("electron")
+const { shell } = require("electron")
 
 export default {
   data () {
@@ -71,7 +94,7 @@ export default {
       bookmark_count: 0, // 选中收藏夹内总数
       bookmarkContent: [], // 当前页具体的内容数组
       current: 1, // 当前所在分页
-      itemContent: {}, // 展示视频封面大图
+      itemContent: {}, // 当前选中的视频对象
       isShowImage: false, // 是否展示图片大图Drawer
       isShowDownload: false, // 是否展示下载页面
       allDownloads: [], // 视频下载分p数组
@@ -88,6 +111,17 @@ export default {
       lastVideoByte: 0, // 上一秒视频已传输字节数
       lastAudioByte: 0, // 上一秒音频已传输字节数
       showAudio: true, // 是否展示音频下载区
+      isShowSelectModal: false, // 是否展示全部下载的视频清晰度选择框
+      allQuality: [], // 全部下载的清晰度名字+代码
+      allCurrentQualityCode: 80, // 当前选择的清晰度代码
+      allSelectLoading: true, // 全部下载清晰度是否正在加载
+      allDownloadUrls: [], // 全部下载的dash数组
+      isShowAllDownload: false, // 全部下载进度框是否显示
+      allVideoProgress: 0, // 全部下载的视频下载进度
+      allAudioProgress: 0, // 全部下载的音频下载进度
+      allHasDownload: [], // 全部下载的已经下载完毕的名称数组
+      allDownloadingName: '', // 全部下载的正在下载的分p名
+      allProgress: 0, // 全部下载的总下载进度
     }
   },
   methods: {
@@ -138,8 +172,109 @@ export default {
     closeDownloadDrawer () { // 关闭下载Drawer
       this.isShowDownload = false
     },
-    downloadAll () { // 下载所选视频的全部分p到文件夹中
-
+    async downloadAll () { // 下载所选视频的全部分p到文件夹中
+      console.log(this.allDownloads);
+      this.isShowSelectModal = true // 展示选择清晰度盒子
+      this.allSelectLoading = true // 展示加载中
+      this.allQuality = [] // 初始化清晰度代码+名称列表
+      this.allDownloadUrls = [] // 初始化dash下载数组
+      let qualityReq = await this.$http({
+        method: 'GET',
+        url: '/api/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[0].cid
+      })
+      console.log(qualityReq)
+      if (qualityReq.data.data.dash) { // dash模式
+        console.log(qualityReq.data.data)
+        for (let i = 0; i <qualityReq.data.data.accept_description.length; i++) {
+          this.allQuality.push({
+            code: qualityReq.data.data.accept_quality[i],
+            name: qualityReq.data.data.accept_description[i]
+          })
+        }
+        console.log(this.allQuality)
+        let reqDownloadList = [] // 下载链接请求列表
+        for (let i = 0; i < this.allDownloads.length; i++) {
+          reqDownloadList.push(this.$http({
+            method: 'GET',
+            url: '/api/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[i].cid
+          }))
+        }
+        let resDownloadUrlList = await this.$http.all(reqDownloadList)
+        for (let i = 0; i < resDownloadUrlList.length; i++) {
+          this.allDownloadUrls.push(resDownloadUrlList[i].data.data.dash)
+        }
+        this.allSelectLoading = false // 关闭加载中效果
+        // console.log(resDownloadUrlList)
+        console.log(this.allDownloadUrls)
+      }
+    },
+    async allSelectQuality (qualityCode) { // 全部下载中选中清晰度代码并下载
+      console.log(this.itemContent)
+      this.allCurrentQualityCode = qualityCode // 保存全部下载清晰度代码
+      this.isShowSelectModal = false // 关闭选择清晰度对话框
+      this.isShowAllDownload = true // 展示下载进度对话框
+      this.allHasDownload = [] // 初始化已下载分p列表
+      this.allProgress = 0 // 初始化总下载进度
+      for (let i = 0; i < this.allDownloadUrls.length; i++) {
+        let videoUrl = '' // 单个视频下载地址
+        let audioUrl = '' // 单个音频下载地址
+        this.allVideoProgress = 0 // 每次循环重置进度条
+        this.allAudioProgress = 0
+        audioUrl = this.allDownloadUrls[i].audio[0].baseUrl
+        this.allDownloadUrls[i].video.forEach(item => {
+          console.log(item.id, qualityCode)
+          if (item.id == qualityCode) {
+            videoUrl = item.baseUrl
+            return true
+          }
+        })
+        console.log('找到：'+videoUrl)
+        if (videoUrl == '') { // 没有找到清晰度代码对应的视频链接
+          videoUrl = this.allDownloadUrls[i].video[0].baseUrl
+        }
+        console.log('video:'+videoUrl)
+        console.log('audio:'+audioUrl)
+        this.allDownloadingName = this.allDownloads[i].part
+        let videoRes = await this.$http({
+          method: 'GET',
+          url: videoUrl,
+          onDownloadProgress: (e) => {
+            // console.log(1)
+            this.allVideoProgress = Math.floor(e.loaded / e.total * 100)
+          },
+          responseType: 'arraybuffer'
+        })
+        let audioRes = await this.$http({
+          method: 'GET',
+          url: audioUrl,
+          onDownloadProgress: (e) => {
+            this.allAudioProgress = Math.floor(e.loaded / e.total * 100)
+          },
+          responseType: 'arraybuffer'
+        })
+        console.log(videoRes)
+        this.allHasDownload.push(this.allDownloadingName)
+        fs.readdir(window.BDownloaderSetting.fileSavePath, (err, files) => { // 开始文件保存合并操作
+          console.log(files, this.itemContent.title)
+          if (files.indexOf(this.itemContent.title) == -1) {
+            fs.mkdir(window.BDownloaderSetting.fileSavePath+'/'+this.itemContent.title.replace(/\s*/g,""), (err) => {
+              if (err) {console.log(err);}
+            })
+          }
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/1.m4s`, new Int8Array(videoRes.data), (err) => {
+            if (err) {console.log(err)}
+          })
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/2.m4s`, new Int8Array(audioRes.data), (err) => {
+            if (err) {console.log(err)}
+          })
+          let output = window.BDownloaderSetting.fileSavePath+'\\'+this.itemContent.title.replace(/\s*/g,"")+'\\'+this.allDownloads[i].part.replace(/\s*/g,"")+'.mp4'
+          childProcess.exec('D:\\ffmpeg\\bin\\ffmpeg.exe -i '+window.BDownloaderSetting.fileSavePath+'\\1.m4s -i '+window.BDownloaderSetting.fileSavePath+'\\2.m4s -codec copy '+output+' -y', (err, stdout, stderr) => {
+            if (err) {console.log(err)}
+            console.log(stdout)
+            this.allProgress = Math.floor(this.allHasDownload.length / this.allDownloadUrls.length * 100)
+          })
+        })
+      }
     },
     openDownloadDetail (video) { // 打开下载详情页
       this.selectedVideoTitle = video.part
@@ -244,6 +379,9 @@ export default {
           })
         })
       }
+    },
+    openHasDownloadFilePath () { // 打开已下载文件所在文件夹
+      shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.itemContent.title}`)
     }
   },
   created () {
@@ -360,5 +498,15 @@ export default {
 }
 .quality-title:hover {
   color: rgb(35, 84, 219);
+}
+.all-quality-name:hover {
+  color: rgb(23, 62, 220);
+  cursor: pointer;
+}
+.all-downloading-name {
+  color: rgb(30, 70, 204);
+}
+.all-has-download {
+  color: rgb(189, 64, 33);
 }
 </style>

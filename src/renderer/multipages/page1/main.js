@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { Button, Icon, Menu, Tooltip, message, Drawer, Tag, Input, Pagination, Select, Progress } from 'ant-design-vue'
+import { Button, Icon, Menu, Tooltip, message, Drawer, Tag, Input, Pagination, Select, Progress, Modal, Spin } from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 
 import App from './App'
@@ -25,6 +25,8 @@ Vue.use(Input)
 Vue.use(Pagination)
 Vue.use(Select)
 Vue.use(Progress)
+Vue.use(Modal)
+Vue.use(Spin)
 
 Vue.prototype.$message = message
 
