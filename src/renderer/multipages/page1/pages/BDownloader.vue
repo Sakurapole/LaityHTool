@@ -381,7 +381,7 @@ export default {
       }
     },
     openHasDownloadFilePath () { // 打开已下载文件所在文件夹
-      shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.itemContent.title}`)
+      shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.itemContent.title.replace(/\s*/g,"")}`)
     }
   },
   created () {

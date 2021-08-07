@@ -7,9 +7,18 @@
 ### 目前计划实现的功能
 1. Todo 已完成
 2. BDownloader 进行中
-3. SpyderCenter 
+    + BiliBili下载功能 需要SESSDATA
+    + 支持收藏夹 已完成
+    + BV/AV
+    + 视频分享链接
+3. SpyderCenter
+    + 服务器爬虫监控
+    + 本机爬虫监控
 4. NoteReader
+    + markdown格式文件阅读
+    + 普通doc阅读
 5. 图床
+    + B站图床
 
 #### Build Setup
 
