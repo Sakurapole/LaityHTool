@@ -86,6 +86,7 @@ export default {
               if (err2) {this.$message.error('保存失败！', 2)}
               this.$message.success('保存成功！', 1)
               // console.log(2)
+              window.BDownloaderSetting = fileData
             })
           })
         }
