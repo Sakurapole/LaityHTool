@@ -41,11 +41,11 @@
           <p class="all-downloading-name">当前下载分p：{{ allDownloadingName }}</p>
           <div class="all-progress-area">
             <p>当前视频下载进度：</p>
-            <a-progress :percent="allVideoProgress"></a-progress>
+            <a-progress :percent="allVideoProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
             <p>当前音频下载进度：</p>
-            <a-progress :percent="allAudioProgress"></a-progress>
+            <a-progress :percent="allAudioProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
             <p>总下载进度：</p>
-            <a-progress :percent="allProgress"></a-progress>
+            <a-progress :percent="allProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
           </div>
           <a-button @click.native="openHasDownloadFilePath" type="primary">打开已下载文件所在文件夹</a-button>
           <div class="all-has-download-area" style="height: 300px; overflow: auto;">
@@ -67,7 +67,7 @@
           <div class="progress-box">
             <div class="video-progress">
               <p>视频下载进度：{{ videoSpeed + 'MB/s' }}</p>
-              <a-progress :percent="progress" status="active"></a-progress>
+              <a-progress :percent="progress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
             </div>
             <div class="audio-progress" v-if="showAudio">
               <p>音频下载进度（dash模式专属）：{{ audioSpeed + 'MB/s' }}</p>
@@ -85,16 +85,21 @@
         <div class="av-bv-input">
           <a-input-search v-model="inputAv" placeholder="这里输入AV号" enterButton style="width: 200px" @search="searchByAvOrBv('av')" />
           <a-input-search v-model="inputBv" placeholder="这里输入BV号" enterButton style="width: 200px" @search="searchByAvOrBv('bv')" />
+          <a-tooltip title="打开保存文件目录">
+            <a-button @click="idOpenSaveFile">
+                <a-icon type="folder" />
+            </a-button>
+          </a-tooltip>
         </div>
       </div>
       <div class="av-bv-main-area">
         <div class="video-pages">
-          <div class="video-page" v-for="(item, index) in searchData.pages" :key="index">
+          <div class="video-page" @click="startIdSingleDownload(item.cid, item.part)" v-for="(item, index) in searchData.pages" :key="index">
             <a-tooltip placement="right">
               <template slot="title">
                 <span>{{ item.part }}</span>
               </template>
-              {{ item.part }}
+              {{ item.part ? item.part : "默认" }}
             </a-tooltip>
           </div>
         </div>
@@ -111,10 +116,14 @@
             <a-tag color="blue" style="font-size: 13px;padding:5px 5px;">单p下载</a-tag>
             <div class="download-progress">
               <p>视频下载进度：</p>
-              <a-progress :percent="idVideoProgress"></a-progress>
+              <a-progress :percent="idVideoProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
               <p>音频下载进度：（Dash模式）</p>
-              <a-progress :percent="idAudioProgress"></a-progress>
+              <a-progress :percent="idAudioProgress" status="active" :stroke-color="{'0%': '#108ee9','100%': '#87d068'}"></a-progress>
             </div>
+            <!-- av/bv单p下载选择清晰度对话框 -->
+            <a-modal v-model="isShowIdQualitySelect" :footer="null">
+              <p @click="idSingleSelectQuality(item.code)" class="av-bv-select-quality-title" v-for="(item, index) in idVideoQuality" :key="index">{{ item.name }}</p>
+            </a-modal>
           </div>
           <div class="multi-download">
             <a-tag color="blue" style="font-size: 13px;padding:5px 5px;">多p下载（全部下载）</a-tag>
@@ -171,8 +180,13 @@ export default {
       inputAv: '', // 输入的Av号
       inputBv: '', // 输入的Bv号
       searchData: {}, // 根据av或bv查询的返回结果
+      idPartName: '', // av/bv模式下选中的分p名称
       idVideoProgress: 0, // av或bv模式下的视频下载进度
       idAudioProgress: 0, // av或bv模式下的音频下载进度
+      idVideoQuality: [], // av或bv模式下的视频清晰度数组
+      isShowIdQualitySelect: false, // av/bv模式下是否展示清晰度选择框
+      idVideoDownloadUrls: [], // av/bv模式下的视频下载链接
+      idAudioDownloadUrls: [], // av/bv模式下的音频下载链接
     }
   },
   methods: {
@@ -372,7 +386,7 @@ export default {
     closeSelectQuality () { // 关闭下载详情页
       this.isShowSelectQuality = false
     },
-    startDownload (url) { // 开始下载
+    startDownload (url) { // 开始单p下载
       console.log(url) // url为json对象
       if (this.selectedVideoSort == 'dash') { // dash模式下载
         let requestList = [] // 视频和音频的请求列表，使用axios的all和spread方法
@@ -449,6 +463,96 @@ export default {
       }
       this.searchData = resData.data.data
       console.log(resData)
+    },
+    async startIdSingleDownload (cid, partName) { // 通过av/bv号开始的单p下载
+      if (partName == '') {
+        this.idPartName = "默认"
+      } else {
+        this.idPartName = partName
+      }
+      let resData = {}
+      if (this.inputAv) {
+        resData = await this.$http({
+          method: 'GET',
+          url: `/api/x/player/playurl?avid=${this.inputAv}&cid=${cid}&fnval=80`
+        })
+      } else {
+        resData = await this.$http({
+          method: 'GET',
+          url: `/api/x/player/playurl?bvid=${this.inputBv}&cid=${cid}&fnval=80`
+        })
+      }
+      console.log(resData)
+      let tmp = []
+      for (let i = 0; i < resData.data.data.accept_description.length; i++) {
+        tmp.push({
+          name: resData.data.data.accept_description[i],
+          code: resData.data.data.accept_quality[i]
+        })
+      }
+      this.idVideoQuality = tmp
+      this.isShowIdQualitySelect = true
+      console.log(this.idVideoQuality)
+      if (resData.data.data.dash) { // dash模式
+        this.idVideoDownloadUrls = resData.data.data.dash.video
+        this.idAudioDownloadUrls = resData.data.data.dash.audio
+      }
+    },
+    idSingleSelectQuality (code) { // 通过av/bv号选择清晰度后开始下载
+      console.log(code)
+      this.isShowIdQualitySelect = false
+      let videoUrl = ''
+      this.idVideoDownloadUrls.forEach((item) => {
+        if (item.id == code) {
+          videoUrl = item.baseUrl
+          return true
+        }
+      })
+      if (videoUrl == '') {
+        videoUrl = this.idVideoDownloadUrls[0].baseUrl
+      }
+      let requestList = [] // 视频和音频的请求列表，使用axios的all和spread方法
+      requestList.push(this.$http({
+        method: 'GET',
+        url: videoUrl,
+        onDownloadProgress: (progressEvent) => {
+          // console.log(progressEvent.loaded / progressEvent.total)
+          this.idVideoProgress = Math.floor(progressEvent.loaded / progressEvent.total * 100)
+        },
+        responseType: 'arraybuffer' // 请求返回响应为ArrayBuffer类型
+      }))
+      requestList.push(this.$http({
+        method: 'GET',
+        url: this.idAudioDownloadUrls[0].baseUrl,
+        onDownloadProgress: (progressEvent) => {
+          this.idAudioProgress = Math.floor(progressEvent.loaded / progressEvent.total * 100)
+        },
+        responseType: 'arraybuffer' // 请求返回响应为ArrayBuffer类型
+      }))
+      this.$http.all(requestList).then(this.$http.spread((...data) => {
+        console.log(data)
+        fs.readdir(window.BDownloaderSetting.fileSavePath, (err, files) => {
+          if (files.indexOf(this.itemContent.title) == -1) {
+            fs.mkdir(window.BDownloaderSetting.fileSavePath+'/'+this.searchData.title.replace(/\s*/g,""), (err) => {
+              if (err) {console.log(err);}
+            })
+          }
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/1.m4s`, new Int8Array(data[0].data), (err) => {
+            if (err) {console.log(err)}
+          })
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/2.m4s`, new Int8Array(data[1].data), (err) => {
+            if (err) {console.log(err)}
+          })
+          let output = window.BDownloaderSetting.fileSavePath+'\\'+this.searchData.title.replace(/\s*/g,"")+'\\'+this.idPartName.replace(/\s*/g,"")+'.mp4'
+          childProcess.exec('D:\\ffmpeg\\bin\\ffmpeg -i '+window.BDownloaderSetting.fileSavePath+'\\1.m4s -i '+window.BDownloaderSetting.fileSavePath+'\\2.m4s -codec copy '+output+' -y', (err, stdout, stderr) => {
+            if (err) {console.log(err)}
+            console.log(stdout)
+          })
+        })
+      }))
+    },
+    idOpenSaveFile () { // av/bv单p下载模式下打开文件所在位置
+      shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.searchData.title.replace(/\s*/g,"")}`)
     }
   },
   created () {
@@ -473,7 +577,6 @@ export default {
         }
       })
     }, 1000)
-    
   }
 }
 </script>
@@ -658,5 +761,11 @@ export default {
 }
 .multi-download {
   margin-top: 10px;
+}
+.av-bv-select-quality-title {
+  cursor: pointer;
+}
+.av-bv-select-quality-title:hover {
+  color: rgb(176, 175, 245);
 }
 </style>
