@@ -127,7 +127,24 @@
           </div>
           <div class="multi-download">
             <a-tag color="blue" style="font-size: 13px;padding:5px 5px;">多p下载（全部下载）</a-tag>
-            <a-button style="display:block;margin-top: 15px;margin-left: 20px;">全部下载</a-button>
+            <a-button @click="idDownloadAll" style="display:block;margin-top: 15px;margin-left: 20px;">全部下载</a-button>
+            <a-modal v-model="isShowIdAllQualitySelect" :footer="null">
+              <a-spin :spinning="allSelectLoading">
+                <p @click="idAllSelectQuality(item.code)" class="av-bv-select-quality-title" v-for="(item, index) in idVideoQuality" :key="index">{{ item.name }}</p>
+              </a-spin>
+            </a-modal>
+            <a-modal v-model="isShowIdAllDownload" :footer="null">
+              <p>视频下载进度：</p>
+              <a-progress :percent="idAllVideoProgress"></a-progress>
+              <p>音频下载进度：</p>
+              <a-progress :percent="idAllAudioProgress"></a-progress>
+              <p>总下载进度：</p>
+              <a-progress :percent="idAllProgress"></a-progress>
+              <a-button @click.native="idOpenSaveFile" type="primary">打开已下载文件所在文件夹</a-button>
+              <div class="all-has-download-area" style="height: 300px; overflow: auto;">
+                <p class="all-has-download" v-for="(item, index) in allHasDownload" :key="index">{{ item }}</p>
+              </div>
+            </a-modal>
           </div>
         </div>
       </div>
@@ -187,6 +204,11 @@ export default {
       isShowIdQualitySelect: false, // av/bv模式下是否展示清晰度选择框
       idVideoDownloadUrls: [], // av/bv模式下的视频下载链接
       idAudioDownloadUrls: [], // av/bv模式下的音频下载链接
+      isShowIdAllQualitySelect: false, // av/bv全部下载模式是否展示清晰度选择框
+      isShowIdAllDownload: false, // av/bv全部下载模式是否展示下载进度展示框
+      idAllVideoProgress: 0, // av/bv全部下载模式下单个视频下载进度
+      idAllAudioProgress: 0, // av/bv全部下载模式下单个音频下载进度
+      idAllProgress: 0, // av/bv全部下载模式下总下载进度
     }
   },
   methods: {
@@ -553,6 +575,102 @@ export default {
     },
     idOpenSaveFile () { // av/bv单p下载模式下打开文件所在位置
       shell.showItemInFolder(window.BDownloaderSetting.fileSavePath+`\\${this.searchData.title.replace(/\s*/g,"")}`)
+    },
+    async idDownloadAll () { // av/bv全部下载选择清晰度
+      this.isShowIdAllQualitySelect = true
+      let qualityReq = await this.$http({
+        method: 'GET',
+        url: '/api/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[0].cid
+      })
+      console.log(qualityReq)
+      if (qualityReq.data.data.dash) { // dash模式
+        console.log(qualityReq.data.data)
+        for (let i = 0; i <qualityReq.data.data.accept_description.length; i++) {
+          this.idVideoQuality.push({
+            code: qualityReq.data.data.accept_quality[i],
+            name: qualityReq.data.data.accept_description[i]
+          })
+        }
+        let reqDownloadList = [] // 下载链接请求列表
+        for (let i = 0; i < this.searchData.pages.length; i++) {
+          reqDownloadList.push(this.$http({
+            method: 'GET',
+            url: '/api/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[i].cid
+          }))
+        }
+        let resDownloadUrlList = await this.$http.all(reqDownloadList)
+        for (let i = 0; i < resDownloadUrlList.length; i++) {
+          this.allDownloadUrls.push(resDownloadUrlList[i].data.data.dash)
+        }
+        this.allSelectLoading = false // 关闭加载中效果
+        // console.log(resDownloadUrlList)
+        console.log(this.allDownloadUrls)
+      }
+    },
+    async idAllSelectQuality(code) {
+      this.isShowIdAllQualitySelect = false
+      this.isShowIdAllDownload = true
+      this.allHasDownload = []
+      this.idAllProgress = 0
+      for (let i = 0; i < this.allDownloadUrls.length; i++) {
+        let videoUrl = '' // 单个视频下载地址
+        let audioUrl = '' // 单个音频下载地址
+        this.idAllVideoProgress = 0
+        this.idAllAudioProgress = 0
+        audioUrl = this.allDownloadUrls[i].audio[0].baseUrl
+        this.allDownloadUrls[i].video.forEach(item => {
+          if (item.id == code) {
+            videoUrl = item.baseUrl
+            return false
+          }
+        })
+        if (videoUrl == '') {
+          videoUrl = this.allDownloadUrls[i].video[0].baseUrl
+        }
+        if (this.allDownloadUrls[i].part == '') {
+          this.idPartName = '默认'
+        } else {
+          this.idPartName = this.searchData.pages[i].part
+        }
+        console.log(this.idPartName)
+        let videoRes = await this.$http({
+          method: 'GET',
+          url: videoUrl,
+          onDownloadProgress: (e) => {
+            // console.log(1)
+            this.idAllVideoProgress = Math.floor(e.loaded / e.total * 100)
+          },
+          responseType: 'arraybuffer'
+        })
+        let audioRes = await this.$http({
+          method: 'GET',
+          url: audioUrl,
+          onDownloadProgress: (e) => {
+            this.idAllAudioProgress = Math.floor(e.loaded / e.total * 100)
+          },
+          responseType: 'arraybuffer'
+        })
+        this.allHasDownload.push(this.idPartName)
+        fs.readdir(window.BDownloaderSetting.fileSavePath, (err, files) => { // 开始文件保存合并操作
+          if (files.indexOf(this.searchData.title) == -1) {
+            fs.mkdir(window.BDownloaderSetting.fileSavePath+'/'+this.searchData.title.replace(/\s*/g,""), (err) => {
+              if (err) {console.log(err);}
+            })
+          }
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/1.m4s`, new Int8Array(videoRes.data), (err) => {
+            if (err) {console.log(err)}
+          })
+          fs.writeFileSync(window.BDownloaderSetting.fileSavePath+`/2.m4s`, new Int8Array(audioRes.data), (err) => {
+            if (err) {console.log(err)}
+          })
+          let output = window.BDownloaderSetting.fileSavePath+'\\'+this.searchData.title.replace(/\s*/g,"")+'\\'+this.idPartName.replace(/\s*/g,"")+'.mp4'
+          childProcess.exec('D:\\ffmpeg\\bin\\ffmpeg.exe -i '+window.BDownloaderSetting.fileSavePath+'\\1.m4s -i '+window.BDownloaderSetting.fileSavePath+'\\2.m4s -codec copy '+output+' -y', (err, stdout, stderr) => {
+            if (err) {console.log(err)}
+            console.log(stdout)
+            this.idAllProgress = Math.floor(this.allHasDownload.length / this.allDownloadUrls.length * 100)
+          })
+        })
+      }
     }
   },
   created () {
