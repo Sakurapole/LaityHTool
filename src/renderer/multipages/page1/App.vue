@@ -16,14 +16,14 @@
     },
     created () {
       console.log(this.$route)
-      fs.readdir(path.join(__dirname, "../../assets/"), (err, files) => { // 读取是否存在数据目录
+      fs.readdir(path.join(`${__static}`, "./"), (err, files) => { // 读取是否存在数据目录
       console.log(files)
       if (files.indexOf('dataDir') == -1) { // 不存在数据目录时新建
-        fs.mkdir(path.join(__dirname, "../../assets/dataDir"), (err2) => {
+        fs.mkdir(path.join(`${__static}`, "./"), (err2) => {
           if (err) throw err
         })
       }
-      fs.readdir(path.join(__dirname, "../../assets/dataDir"), (err3, dataFiles) => { // 读取数据目录
+      fs.readdir(path.join(`${__static}`, "./dataDir"), (err3, dataFiles) => { // 读取数据目录
         console.log(dataFiles)
         if (dataFiles.indexOf('todo.json') == -1) { // 是否存在todo的文件
           let todo = {
@@ -33,7 +33,7 @@
             },
             "setting": {} // 配置文件
           }
-          fs.writeFile(path.join(__dirname, "../../assets/dataDir/todo.json"), JSON.stringify(todo), (err4) => { // 不存在todo的文件新增
+          fs.writeFile(path.join(`${__static}`, "./dataDir/todo.json"), JSON.stringify(todo), (err4) => { // 不存在todo的文件新增
             if (err4) {console.log(err4)}
           })
         }
@@ -44,14 +44,14 @@
             fileSavePath: '',
             mid: ''
           }
-          fs.writeFile(path.join(__dirname, "../../assets/dataDir/BDownloader.json"), JSON.stringify(BDownloaderSetting), (err5) => {
+          fs.writeFile(path.join(`${__static}`, "./dataDir/BDownloader.json"), JSON.stringify(BDownloaderSetting), (err5) => {
             if (err5) {console.log(err5)}
           })
         }
       })
     })
       if (!window.BDownloaderSetting) { // 读取BDownloader.json配置文件
-        fs.readFile(path.join(__dirname, "../../assets/dataDir/BDownloader.json"), (err, data) => {
+        fs.readFile(path.join(`${__static}`, "./dataDir/BDownloader.json"), (err, data) => {
           let fileData = JSON.parse(data)
           window.BDownloaderSetting = {
             SESSDATA: fileData.SESSDATA,
@@ -104,5 +104,8 @@
   }
   .ant-progress-text {
     color: rgb(15, 72, 194);
+  }
+  .ant-upload-list-item-info {
+    background: #1d518b;
   }
 </style>

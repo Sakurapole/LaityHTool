@@ -72,12 +72,13 @@ function createWindow () { // 创建主窗口
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true, // 打开remote模块
-      contextIsolation: false
+      contextIsolation: false,
+      webSecurity: false
     },
     frame: false
   })
   // console.log(__dirname)
-  tray = new Tray(path.join(__dirname,'L.png'))
+  tray = new Tray(path.join(`${__static}`,'L.png'))
   tray.on('click', () => { // 单击任务栏图标显示主窗口
     mainWindow.show()
   })
@@ -108,6 +109,8 @@ app.setLoginItemSettings({ // 设置开机自启动
     '--processStart', `${exeName}`
   ]
 })
+
+app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
 app.on('ready', createWindow)
 

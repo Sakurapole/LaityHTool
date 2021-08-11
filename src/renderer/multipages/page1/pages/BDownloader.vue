@@ -217,7 +217,7 @@ export default {
       // console.log(value)
       this.$http({
         method: 'GET',
-        url: '/api/x/v3/fav/resource/list?media_id=' + value + '&ps=20&pn=1'
+        url: 'https://api.bilibili.com/x/v3/fav/resource/list?media_id=' + value + '&ps=20&pn=1'
       }).then(res => {
         console.log(res)
         if (res.data.code == 0) {
@@ -229,7 +229,7 @@ export default {
     changePage (page, pageSize) { // 更改页码
       this.$http({
         method: 'GET',
-        url: '/api/x/v3/fav/resource/list?media_id=' + this.selectedBookmark + '&ps=20&pn=' + page
+        url: 'https://api.bilibili.com/x/v3/fav/resource/list?media_id=' + this.selectedBookmark + '&ps=20&pn=' + page
       }).then(res => {
         console.log(res)
         if (res.data.code == 0) {
@@ -249,7 +249,7 @@ export default {
       this.isShowDownload = true
       this.$http({
         method: 'GET',
-        url: '/api/x/web-interface/view?bvid='+item.bvid
+        url: 'https://api.bilibili.com/x/web-interface/view?bvid='+item.bvid
       }).then(res => {
         if (res.data.code == 0) {
           this.allDownloads = res.data.data.pages
@@ -267,7 +267,7 @@ export default {
       this.allDownloadUrls = [] // 初始化dash下载数组
       let qualityReq = await this.$http({
         method: 'GET',
-        url: '/api/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[0].cid
+        url: 'https://api.bilibili.com/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[0].cid
       })
       console.log(qualityReq)
       if (qualityReq.data.data.dash) { // dash模式
@@ -283,7 +283,7 @@ export default {
         for (let i = 0; i < this.allDownloads.length; i++) {
           reqDownloadList.push(this.$http({
             method: 'GET',
-            url: '/api/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[i].cid
+            url: 'https://api.bilibili.com/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+this.allDownloads[i].cid
           }))
         }
         let resDownloadUrlList = await this.$http.all(reqDownloadList)
@@ -367,7 +367,7 @@ export default {
       this.selectedVideoTitle = video.part
       this.$http({
         method: 'GET',
-        url: '/api/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+video.cid
+        url: 'https://api.bilibili.com/x/player/playurl?fnval=16&bvid='+this.itemContent.bvid+'&cid='+video.cid
       }).then(res => {
         this.isShowSelectQuality = true
         console.log(res)
@@ -387,7 +387,7 @@ export default {
             for (let i = 0; i < allQuality.length; i++) {
               reqList.push(this.$http({
                 method: 'GET',
-                url: '/api/x/player/playurl?fnval=0&bvid='+this.itemContent.bvid+'&cid='+video.cid+'&qn='+allQuality[i]
+                url: 'https://api.bilibili.com/x/player/playurl?fnval=0&bvid='+this.itemContent.bvid+'&cid='+video.cid+'&qn='+allQuality[i]
               }))
             }
             this.$http.all(reqList).then(this.$http.spread((...data) => {
@@ -475,12 +475,12 @@ export default {
       if (type == 'av') { // 输入为av号
         resData = await this.$http({
           method: 'GET',
-          url: '/api/x/web-interface/view?aid='+this.inputAv
+          url: 'https://api.bilibili.com/x/web-interface/view?aid='+this.inputAv
         })
       } else if (type == 'bv') { // 输入为bv号
         resData = await this.$http({
           method: 'GET',
-          url: '/api/x/web-interface/view?bvid='+this.inputBv
+          url: 'https://api.bilibili.com/x/web-interface/view?bvid='+this.inputBv
         })
       }
       this.searchData = resData.data.data
@@ -496,12 +496,12 @@ export default {
       if (this.inputAv) {
         resData = await this.$http({
           method: 'GET',
-          url: `/api/x/player/playurl?avid=${this.inputAv}&cid=${cid}&fnval=80`
+          url: `https://api.bilibili.com/x/player/playurl?avid=${this.inputAv}&cid=${cid}&fnval=80`
         })
       } else {
         resData = await this.$http({
           method: 'GET',
-          url: `/api/x/player/playurl?bvid=${this.inputBv}&cid=${cid}&fnval=80`
+          url: `https://api.bilibili.com/x/player/playurl?bvid=${this.inputBv}&cid=${cid}&fnval=80`
         })
       }
       console.log(resData)
@@ -580,7 +580,7 @@ export default {
       this.isShowIdAllQualitySelect = true
       let qualityReq = await this.$http({
         method: 'GET',
-        url: '/api/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[0].cid
+        url: 'https://api.bilibili.com/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[0].cid
       })
       console.log(qualityReq)
       if (qualityReq.data.data.dash) { // dash模式
@@ -595,7 +595,7 @@ export default {
         for (let i = 0; i < this.searchData.pages.length; i++) {
           reqDownloadList.push(this.$http({
             method: 'GET',
-            url: '/api/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[i].cid
+            url: 'https://api.bilibili.com/x/player/playurl?fnval=16&bvid='+this.searchData.bvid+'&cid='+this.searchData.pages[i].cid
           }))
         }
         let resDownloadUrlList = await this.$http.all(reqDownloadList)
@@ -675,7 +675,7 @@ export default {
   },
   created () {
     if (!window.BDownloaderSetting) { // 建立BDownloder的配置到window
-      fs.readFile(path.join(__dirname, "../../../assets/dataDir/BDownloader.json"), (err, data) => {
+      fs.readFile(path.join(`${__static}`, './dataDir/BDownloader.json'), (err, data) => {
         let fileData = JSON.parse(data)
         window.BDownloaderSetting = {
           SESSDATA: fileData.SESSDATA,
@@ -687,7 +687,7 @@ export default {
     setTimeout(() => { // 获取收藏夹内容
       this.$http({
         method: 'GET',
-        url: "/api/x/v3/fav/folder/created/list-all?up_mid=" + window.BDownloaderSetting.mid
+        url: "https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid=" + window.BDownloaderSetting.mid
       }).then(res => {
         console.log(res)
         if (res.data.code == 0) {

@@ -4,6 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'hash',
   routes: [
     {
       path: '/',
@@ -49,6 +50,21 @@ export default new Router({
           path: '/NoteList',
           name: 'NoteList',
           component: () => import('../pages/NoteReaderSetting.vue')
+        },
+        {
+          path: '/DrawingBed',
+          name: 'DrawingBed',
+          component: () => import('../pages/DrawingBed')
+        },
+        {
+          path: '/DrawingBedHasUpload',
+          name: 'DrawingBedHasUpload',
+          component: () => import('../pages/DrawingBedHasUpload.vue')
+        },
+        {
+          path: '/DrawingBedSetting',
+          name: 'DrawingBedSetting',
+          component: () => import('../pages/DrawingBedSetting')
         }
       ]
     },

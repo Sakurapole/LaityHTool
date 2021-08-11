@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     readLocalToDo () {
-      fs.readFile(path.join(__dirname, '../../../assets/dataDir/todo.json'), (err, data) => { // 从本地读取todo.json文件
+      fs.readFile(path.join(`${__static}`, './dataDir/todo.json'), (err, data) => { // 从本地读取todo.json文件
         if (err) {console.log(err)}
         console.log(JSON.parse(data))
         this.todoList = JSON.parse(data).data.will
@@ -126,7 +126,7 @@ export default {
       this.allData.data.will.splice(index, 1) // 删除指定元素
       this.todoList = this.allData.data.will // 更新展示Todo
       // 写入文件中
-      fs.writeFile(path.join(__dirname, '../../../assets/dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
+      fs.writeFile(path.join(`${__static}`, './dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
         if (err) {console.log(err)}
       })
     },
@@ -134,7 +134,7 @@ export default {
       this.allData.data.will.splice(index, 1) // 删除元素
       this.todoList = this.allData.data.will // 更新展示Todo
       // 写入到文件
-      fs.writeFile(path.join(__dirname, '../../../assets/dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
+      fs.writeFile(path.join(`${__static}`, './dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
         if (err) {console.log(err)}
       })
     },
@@ -161,7 +161,7 @@ export default {
       this.todoList = this.allData.data.will // 更新视图
       this.inputTitle = this.inputTime = this.inputStatus = '' // 添加后置空
       // 写入到文件
-      fs.writeFile(path.join(__dirname, '../../../assets/dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
+      fs.writeFile(path.join(`${__static}`, './dataDir/todo.json'), JSON.stringify(this.allData), (err) => {
         if (err) {
           console.log(err)
           this.$message.error(

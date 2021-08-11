@@ -29,6 +29,14 @@
         <a-menu-item key="7" @click="enter">Note List</a-menu-item>
         <a-menu-item key="8" @click="enter">Setting</a-menu-item>
       </a-sub-menu>
+      <a-sub-menu key="sub5">
+        <span slot="title">
+          <span>Drawing Bed</span>
+        </span>
+        <a-menu-item key="9" @click="enter">Drawing Bed</a-menu-item>
+        <a-menu-item key="10" @click="enter">HasUpload</a-menu-item>
+        <a-menu-item key="11" @click="enter">Setting</a-menu-item>
+      </a-sub-menu>
     </a-menu>
   </div>
 </template>
@@ -59,6 +67,12 @@ export default {
         this.$router.push('/NoteList')
       } else if (e.key == "8" && this.$route.path != '/NoteListSetting') {
         this.$router.push('/NoteListSetting')
+      } else if (e.key == "9" && this.$route.path != '/DrawingBed') {
+        this.$router.push('/DrawingBed')
+      } else if (e.key == "10" && this.$route.path != '/DrawingBedHasUpload') {
+        this.$router.push('/DrawingBedHasUpload')
+      } else if (e.key == "11" && this.$route.path != '/DrawingBedSetting') {
+        this.$router.push('/DrawingBedSetting')
       }
     }
   }

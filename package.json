@@ -14,17 +14,17 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-    "postinstall": ""
+    "postinstall": "",
+    "buildTwo": "node ./node_modules/electron-builder --projectDir ./dist/electron"
   },
   "build": {
     "productName": "laityhtool",
     "appId": "com.laityh.tool",
     "directories": {
-      "output": "build",
-      "app": "."
+      "output": "build"
     },
     "files": [
-      "./**/*"
+      "dist/electron/**/*"
     ],
     "dmg": {
       "contents": [
@@ -54,8 +54,10 @@
   "dependencies": {
     "ant-design-vue": "^1.7.6",
     "axios": "^0.21.1",
+    "multispinner": "^0.2.1",
     "request": "^2.88.2",
     "sql.js": "^1.5.0",
+    "v-viewer": "^1.6.4",
     "vue": "^2.5.16",
     "vue-color": "^2.8.1",
     "vue-electron": "^1.0.6",

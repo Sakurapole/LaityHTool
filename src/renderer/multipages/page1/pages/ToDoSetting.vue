@@ -66,7 +66,7 @@ export default {
         filters: [{ name: 'Custom File Type', extensions: ['json'] }]
       }).then(res => {
         console.log(res)
-        fs.readFile(path.join(__dirname, '../../../assets/dataDir/todo.json'), (err, data) => { // 从本地读取todo.json文件
+        fs.readFile(path.join(`${__static}`, './dataDir/todo.json'), (err, data) => { // 从本地读取todo.json文件
           if (err) {console.log(err)}
           console.log(JSON.parse(data))
           fs.writeFile(res.filePath, JSON.stringify(JSON.parse(data),"","\t"), (err2) => {
