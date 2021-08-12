@@ -97,6 +97,7 @@ function createWindow () { // 创建主窗口
 
   session.defaultSession.webRequest.onBeforeSendHeaders(bilibiliFilter, (details, callback) => {
       details.requestHeaders['Referer'] = 'http://www.bilibili.com'
+      details.requestHeaders['Cookie'] = 'SESSDATA=85895da3%2C1638958149%2C76372*61'
       callback({ requestHeaders: details.requestHeaders });
   })
 }

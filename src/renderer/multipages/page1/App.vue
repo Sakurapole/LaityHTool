@@ -37,7 +37,6 @@
             if (err4) {console.log(err4)}
           })
         }
-        // console.log(dataFiles.indexOf('BDownloader.json') == -1)
         if (dataFiles.indexOf('BDownloader.json') == -1) { // 是否存在BDownloader的配置文件
           let BDownloaderSetting = {
             SESSDATA: '',
@@ -46,6 +45,14 @@
           }
           fs.writeFile(path.join(`${__static}`, "./dataDir/BDownloader.json"), JSON.stringify(BDownloaderSetting), (err5) => {
             if (err5) {console.log(err5)}
+          })
+        }
+        if (dataFiles.indexOf('HasUploadImages.json') == -1) { // 是否存在HasUploadImages文件，包含已上传的图片
+          let hasUploadImages = {
+            images: []
+          }
+          fs.writeFile(path.join(`${__static}`, "./dataDir/HasUploadImages.json"), JSON.stringify(hasUploadImages, "", "\t"), (err6) => {
+            if (err6) {console.log(err6)}
           })
         }
       })
@@ -105,7 +112,7 @@
   .ant-progress-text {
     color: rgb(15, 72, 194);
   }
-  .ant-upload-list-item-info {
-    background: #1d518b;
+  .ant-upload-list-item, .ant-upload-list-item-undefined, .ant-upload-list-item-list-type-text {
+    display: none;
   }
 </style>

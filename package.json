@@ -52,6 +52,7 @@
     }
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "ant-design-vue": "^1.7.6",
     "axios": "^0.21.1",
     "multispinner": "^0.2.1",
