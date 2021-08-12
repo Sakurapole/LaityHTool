@@ -120,7 +120,7 @@ export default {
 <style scoped>
 .downloader-setting-container {
   width: 100%;
-  height: calc(100vh - 30px);
+  /* height: calc(100vh - 30px); */
   display: flex;
   flex-direction: column;
   /* justify-content: center; */

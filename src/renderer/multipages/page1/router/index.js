@@ -65,6 +65,11 @@ export default new Router({
           path: '/DrawingBedSetting',
           name: 'DrawingBedSetting',
           component: () => import('../pages/DrawingBedSetting')
+        },
+        {
+          path: '/AllSetting',
+          name: 'AllSetting',
+          component: () => import('../pages/AllSetting')
         }
       ]
     },

@@ -93,8 +93,8 @@ export default {
 
 <style scoped>
 .todo-setting-container {
-  overflow: auto;
-  height: calc(100vh - 30px);
+  /* overflow: auto; */
+  /* height: calc(100vh - 30px); */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -117,8 +117,8 @@ export default {
 }
 .export-area {
   width: 100%;
-  height: 40px;
-  line-height: 40px;
+  /* height: 40px; */
+  /* line-height: 40px; */
   display: flex;
   flex-direction: column;
 }
@@ -131,7 +131,7 @@ export default {
 }
 .export-btn {
   width: 100px;
-  height: 50px;
+  height: 40px;
   padding: 5px 0;
   margin-top: 20px;
   margin-left: 20px;
