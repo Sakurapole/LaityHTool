@@ -95,7 +95,7 @@ export default {
       }
     },
     batchDelete () { // 批量删除
-      fs.readFile(path.join(`${__static}`,'./dataDir/HasUploadImages.json'), (err, data) => {
+      fs.readFile(path.join(process.cwd(),'./dataDir/HasUploadImages.json'), (err, data) => {
         if (err) return console.log('读取文件失败：' + err.message)
         let readData = JSON.parse(data).images
         for (let i in this.selectedImages) {
@@ -104,7 +104,7 @@ export default {
         let writeData = {
           images: readData
         }
-        fs.writeFileSync(path.join(`${__static}`, './dataDir/HasUploadImages.json'), JSON.stringify(writeData,"","\t"), (err2) => {
+        fs.writeFileSync(path.join(process.cwd(), './dataDir/HasUploadImages.json'), JSON.stringify(writeData,"","\t"), (err2) => {
           if (err2) return console.log(err2)
         })
         this.hasUploadImages = []
@@ -114,14 +114,13 @@ export default {
         }
         this.selectedImages = []
       })
-      // this.readFileAndSort()
     },
     reload () {
       this.readFileAndSort()
     },
     readFileAndSort () { // 从文件读取数据并刷新页面
       this.hasUploadImages = [] // 初始化已上传文件数组
-      fs.readFile(path.join(`${__static}`, "./dataDir/HasUploadImages.json"), (err, data) => {
+      fs.readFile(path.join(process.cwd(), "./dataDir/HasUploadImages.json"), (err, data) => {
         if (err) {console.log(err)}
         let readData = JSON.parse(data).images
         // this.hasUploadImages = JSON.parse(data).images
@@ -135,6 +134,7 @@ export default {
   },
   created () {
     this.readFileAndSort()
+    console.log()
   }
 }
 </script>

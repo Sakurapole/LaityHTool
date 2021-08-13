@@ -102,14 +102,14 @@ export default {
         console.log(resData.data.data.image_url)
         resArr.push(resData.data.data)
       }
-      fs.readFile(path.join(`${__static}`, './dataDir/HasUploadImages.json'), (err, data) => {
+      fs.readFile(path.join(process.cwd(), './dataDir/HasUploadImages.json'), (err, data) => {
         console.log(JSON.parse(data))
         let willData = JSON.parse(data)
         console.log(resArr)
         resArr.forEach(item => {
           willData.images.push(item.image_url)
         })
-        fs.writeFileSync(path.join(`${__static}`, './dataDir/HasUploadImages.json'), JSON.stringify(willData, "", "\t"), (err2) => {
+        fs.writeFileSync(path.join(process.cwd(), './dataDir/HasUploadImages.json'), JSON.stringify(willData, "", "\t"), (err2) => {
           if (err2) {console.log(err2)}
         })
       })

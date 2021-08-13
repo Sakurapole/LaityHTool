@@ -675,7 +675,7 @@ export default {
   },
   created () {
     if (!window.BDownloaderSetting) { // 建立BDownloder的配置到window
-      fs.readFile(path.join(`${__static}`, './dataDir/BDownloader.json'), (err, data) => {
+      fs.readFile(path.join(process.cwd(), './dataDir/BDownloader.json'), (err, data) => {
         let fileData = JSON.parse(data)
         window.BDownloaderSetting = {
           SESSDATA: fileData.SESSDATA,

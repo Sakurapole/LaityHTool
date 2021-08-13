@@ -53,14 +53,14 @@ export default {
         console.log(res);
         if (res.data.code == 0) {
           const fs = require("fs")
-          fs.readFile(path.join(`${__static}`, './dataDir/BDownloader.json'), (err, data) => {
+          fs.readFile(path.join(process.cwd(), './dataDir/BDownloader.json'), (err, data) => {
             // console.log(JSON.parse(data))
             let fileData = JSON.parse(data)
             fileData.SESSDATA = this.SESSDATA // 用户session data
             fileData.mid = res.data.data.mid // 用户mid
             // console.log(fileData);
             this.mid = fileData.mid
-            fs.writeFile(path.join(`${__static}`, './dataDir/BDownloader.json'), JSON.stringify(fileData,"","\t"), (err2) => {
+            fs.writeFile(path.join(process.cwd(), './dataDir/BDownloader.json'), JSON.stringify(fileData,"","\t"), (err2) => {
               if (err2) {this.$message.error('保存失败！', 2)}
               this.$message.success('保存成功！', 1)
             })
@@ -77,12 +77,12 @@ export default {
         if (!filePath.canceled) {
           // console.log(filePath)
           this.fileSavePath = filePath.filePaths[0]
-          fs.readFile(path.join(`${__static}`, './dataDir/BDownloader.json'), (err, data) => {
+          fs.readFile(path.join(process.cwd(), './dataDir/BDownloader.json'), (err, data) => {
             // console.log(JSON.parse(data))
             let fileData = JSON.parse(data)
             // this.SESSDATA = fileData.SESSDATA
             fileData.fileSavePath = this.fileSavePath
-            fs.writeFile(path.join(`${__static}`, './dataDir/BDownloader.json'), JSON.stringify(fileData,"","\t"), (err2) => {
+            fs.writeFile(path.join(process.cwd(), './dataDir/BDownloader.json'), JSON.stringify(fileData,"","\t"), (err2) => {
               if (err2) {this.$message.error('保存失败！', 2)}
               this.$message.success('保存成功！', 1)
               // console.log(2)
@@ -96,7 +96,7 @@ export default {
   created () {
     // console.log(__dirname)
     if (!window.BDownloaderSetting) {
-      fs.readFile(path.join(`${__static}`, './dataDir/BDownloader.json'), (err, data) => {
+      fs.readFile(path.join(process.cwd(), './dataDir/BDownloader.json'), (err, data) => {
         console.log(JSON.parse(data))
         let fileData = JSON.parse(data)
         window.BDownloaderSetting = {
