@@ -13,12 +13,12 @@
     <a-checkbox-group>
       <div class="image-box" v-for="(item, index) in hasUploadImages" :key="index">
         <div class="img-hover-box" v-for="(item2, index2) in item" :key="index2">
-          <img :src="item2.image_url" alt="加载失败">
+          <img :src="item2" alt="加载失败">
           <div class="img-hover func-area">
-            <a-checkbox  @change="onChange" :value="item2.image_url"></a-checkbox>
+            <a-checkbox  @change="onChange" :value="item2"></a-checkbox>
             <!-- <a-icon type="copy" class="copy-btn" /> -->
             <a-dropdown>
-              <a-menu slot="overlay" @click="copy($event, item2.image_url)">
+              <a-menu slot="overlay" @click="copy($event, item2)">
                 <a-menu-item key="1">
                   copy link
                 </a-menu-item>
@@ -101,7 +101,6 @@ export default {
         for (let i in this.selectedImages) {
           readData.splice(readData.indexOf(this.selectedImages[i]), 1)
         }
-        console.log(readData)
         let writeData = {
           images: readData
         }

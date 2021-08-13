@@ -107,7 +107,7 @@ export default {
         let willData = JSON.parse(data)
         console.log(resArr)
         resArr.forEach(item => {
-          willData.images.push(item)
+          willData.images.push(item.image_url)
         })
         fs.writeFileSync(path.join(`${__static}`, './dataDir/HasUploadImages.json'), JSON.stringify(willData, "", "\t"), (err2) => {
           if (err2) {console.log(err2)}

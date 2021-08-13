@@ -1,6 +1,6 @@
 {
   "name": "laityhtool",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "LaityH <1831495788@qq.com>",
   "description": "基于electron构建的桌面工具集",
   "license": null,

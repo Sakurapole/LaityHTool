@@ -67,38 +67,6 @@ function startRenderer () {
         quiet: true,
         hot: true,
         proxy: {
-          '/api': {
-            // 请求的目标服务器地址
-            target: 'https://api.bilibili.com',
-            // 如果是https接口，需要配置这个参数
-            secure: false,
-            // 设置允许跨域
-            changeOrigin: true,
-            // 重写路径
-            pathRewrite: {
-              '^/api': ''
-            },
-            headers: {
-              referer: 'https://api.bilibili.com',
-              cookie: 'SESSDATA=85895da3%2C1638958149%2C76372*61'
-            }
-          },
-          '/imgUpload': {
-            // 请求的目标服务器地址
-            target: 'https://api.bilibili.com',
-            // 如果是https接口，需要配置这个参数
-            secure: false,
-            // 设置允许跨域
-            changeOrigin: true,
-            // 重写路径
-            pathRewrite: {
-              '^/imgUpload': ''
-            },
-            headers: {
-              referer: 'https://www.bilibili.com',
-              cookie: 'SESSDATA=85895da3%2C1638958149%2C76372*61'
-            }
-          }
         },
         before (app, ctx) {
           // app.use(hotMiddleware)

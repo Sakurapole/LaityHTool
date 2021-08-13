@@ -1,14 +1,3 @@
 {
-	"images": [
-		{
-			"image_url": "http://i0.hdslb.com/bfs/album/bc9b7f708584464b224e607cf88d34c4fe3ca49f.jpg",
-			"image_width": 4608,
-			"image_height": 3456
-		},
-		{
-			"image_url": "http://i0.hdslb.com/bfs/album/3a5395ec1cfafc210e46a409d254d788c59bd484.jpg",
-			"image_width": 4608,
-			"image_height": 3456
-		}
-	]
+	"images": []
 }
