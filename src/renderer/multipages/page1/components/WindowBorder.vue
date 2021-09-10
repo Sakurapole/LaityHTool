@@ -37,7 +37,7 @@ export default {
     switchTheme (value) { // 切换主题
       console.log(value)
       ipcRenderer.send('switch-theme', value)
-      document.head.querySelector('#skin').setAttribute('href',`/public/theme/${value}.css`)
+      document.head.querySelector('#skin').setAttribute('href',`${__static}/theme/${value}.css`)
     },
     minWindow () {
       ipcRenderer.send('minWindow')

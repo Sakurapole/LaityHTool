@@ -46,7 +46,7 @@ export default {
     }
 
     ipcRenderer.on('switch-theme', (e, value) => { // 响应切换主题
-      document.head.querySelector('#skin').setAttribute('href',`/public/theme/${value}.css`)
+      document.head.querySelector('#skin').setAttribute('href',`${__static}/theme/${value}.css`)
     })
 
     window.addEventListener('keyup', function (e) { // esc快捷退出窗口

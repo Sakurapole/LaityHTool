@@ -1,0 +1,18 @@
+:root {
+    --theme-background-color: rgb(41, 37, 37);
+    --border-color: rgb(83, 83, 83);
+    --normal-text-color: #ccc;
+    --func-btn-hover-color: #000;
+    --func-btn-hover-background-color: rgba(248, 246, 246, 0.5);
+    --index-menu-selected-background-color: rgb(65, 58, 58);
+    --todo-func-btn-background-color: rgba(27, 26, 26, 0.726);
+    --todo-func-btn-hover-background-color: rgb(61, 61, 61);
+    --todo-status-btn-selected: #000;
+    --todo-item-hover-background-color: rgba(49, 48, 48, 0.753);
+    --downloader-bookmark-item-background-color: rgba(54, 54, 54, 0.801);
+    --input-background-color: rgb(49,49,49);
+    --self-define-btn-background-color: rgb(49,49,49);
+    --self-define-btn-hover-background-color: rgb(77, 77, 77);
+    --funcs-hover-background-color: rgb(31, 30, 30);
+    --funcs-hover-text-color: #c9c9c9;
+}

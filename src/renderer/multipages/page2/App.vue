@@ -22,7 +22,7 @@
       FuncTopBar: () => import("./components/FuncTopBar.vue")
     },
     created () {
-
+      document.head.querySelector('#skin').setAttribute('href',`${__static}/theme/night.css`)
     }
   }
 </script>

@@ -17,6 +17,7 @@
       WindowBorder: () => import('./components/WindowBorder')
     },
     created () {
+      document.head.querySelector('#skin').setAttribute('href',`${__static}/theme/night.css`)
       // console.log(this.$route)
       // console.log(path.join(process.cwd(), "./"))
       fs.readdir(path.join(process.cwd(), "./"), (err, files) => { // 读取是否存在数据目录
