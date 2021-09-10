@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, session } from 'electron'
+import { 
+        app,
+        BrowserWindow, 
+        ipcMain, 
+        Tray, 
+        Menu, 
+        session,
+        globalShortcut
+      } from 'electron'
 import '../renderer/store'
 
 const path = require('path')
@@ -20,7 +28,7 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080/page1.html`
   : `file://${__dirname}/page1.html`
 
-const trayMenu = Menu.buildFromTemplate([
+const trayMenu = Menu.buildFromTemplate([ // 托盘菜单
   {
     label: '设置',
     click: () => {
@@ -83,19 +91,29 @@ function createWindow () { // 创建主窗口
     mainWindow.show()
   })
   tray.setToolTip('LaityHTool')
-  tray.setContextMenu(trayMenu)
+  tray.setContextMenu(trayMenu) // 加载菜单
   mainWindow.loadURL(winURL) // 加载页面
 
   mainWindow.on('closed', () => { // 关闭主窗口销毁
     mainWindow = null
   })
 
-  const bilibiliFilter = {
+  const ret = globalShortcut.register('CommandOrControl+Shift+Q', () => {
+    mainWindow.show()
+  })
+
+  if(!ret) {
+    console.log("registration failed")
+  }
+
+  // console.log(globalShortcut.isRegistered('CommandOrControl+Shift+Q'))
+
+  const bilibiliFilter = { // 以下网址设置cookie和referer
     urls: ["https://*.bilibili.com/*", "http://*.bilibili.com/*", "http://*.hdslb.com/*", "https://*.bilivideo.com/*",
             "https://*/*"]
 }
 
-  session.defaultSession.webRequest.onBeforeSendHeaders(bilibiliFilter, (details, callback) => {
+  session.defaultSession.webRequest.onBeforeSendHeaders(bilibiliFilter, (details, callback) => { // 通过session模块指定设置cookie和referer
       details.requestHeaders['Referer'] = 'http://www.bilibili.com'
       details.requestHeaders['Cookie'] = 'SESSDATA=85895da3%2C1638958149%2C76372*61'
       callback({ requestHeaders: details.requestHeaders });
@@ -121,19 +139,23 @@ app.on('window-all-closed', () => {
   }
 })
 
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll() // 注销所有全局快捷键监听
+})
+
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
 })
 
-ipcMain.on('minWindow', () => { // 监听最小化主窗口时间
+ipcMain.on('minWindow', () => { // 监听最小化主窗口事件
   if (mainWindow) {
     mainWindow.minimize()
   }
 })
 
-ipcMain.on('closeWindow', () => { // 监听隐藏主窗口时间
+ipcMain.on('closeWindow', () => { // 监听隐藏主窗口事件
   if (mainWindow) {
     mainWindow.hide()
   }
@@ -167,7 +189,7 @@ ipcMain.on('startTodo', (e, options) => { // 开启Todo的桌面置顶模式
   mainWindow.hide()
 })
 
-ipcMain.on('closeTodoWindow', () => {
+ipcMain.on('closeTodoWindow', () => { // 监听关闭todo窗口消息
   if (todoWindow) {
     todoWindow.close()
     todoWindow = null // 销毁todoWindow
@@ -180,6 +202,12 @@ ipcMain.on('setCookie', (e, options) =>{
   session.defaultSession.cookies.set(JSON.parse(options), (err) => {
     console.log(err);
   })
+})
+
+ipcMain.on('esc', (e) => {
+  if(mainWindow) {
+    mainWindow.hide()
+  }
 })
 
 /**

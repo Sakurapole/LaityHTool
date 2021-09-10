@@ -3,6 +3,17 @@
     <div class="app-title">
       LaityHTool
     </div>
+    <div class="switch-theme">
+      <!-- <a-switch class="switch-theme-button" @change="switchTheme" default-checked></a-switch> -->
+      <a-select default-value="night" style="width: 120px;" @change="switchTheme">
+        <a-select-option value="night">
+          黑夜主题
+        </a-select-option>
+        <a-select-option value="day">
+          白天主题
+        </a-select-option>
+      </a-select>
+    </div>
     <div class="min-button" @click="minWindow">
       <a-icon type="minus" />
     </div>
@@ -20,6 +31,10 @@ export default {
     }
   },
   methods: {
+    switchTheme (value) { // 切换主题
+      console.log(value)
+      document.head.querySelector('#skin').setAttribute('href',`/public/theme/${value}.css`)
+    },
     minWindow () {
       ipcRenderer.send('minWindow')
     },
@@ -33,7 +48,8 @@ export default {
 <style scoped>
 #border-container {
   height: 30px;
-  border-bottom: 1px solid #ccc;
+  /* border-bottom: 1px solid #ccc; */
+  padding-bottom: 1px;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -47,7 +63,14 @@ export default {
   left: 5px;
   text-align: center;
   font-size: 16px;
-  color: #ccc;
+  color: var(--normal-text-color);
+}
+.switch-theme {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  -webkit-app-region: no-drag;
 }
 .min-button, .close-button {
   width: 29px;
@@ -55,13 +78,13 @@ export default {
   height: 29px;
   line-height: 30px;
   font-size: 16px;
-  color: #fff;
+  color: var(--normal-text-color);
   cursor: pointer;
   -webkit-app-region: no-drag;
   transition: all 0.4s;
 }
 .min-button:hover, .close-button:hover {
-  background: rgba(248, 246, 246, 0.5);
-  color: #000;
+  background: var(--func-btn-hover-background-color);
+  color: var(--func-hover-btn-color);
 }
 </style>

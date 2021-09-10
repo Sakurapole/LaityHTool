@@ -706,17 +706,8 @@ export default {
   overflow: auto;
 }
 .BDownloader-container::-webkit-scrollbar {
-  width: 5px;
+  width: 0px;
   height: 1px;
-}
-.BDownloader-container::-webkit-scrollbar-thumb { /* 滚动条中的滑条 */
-  border-radius: 0;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-  background: #1d518b;
-}
-.BDownloader-container::-webkit-scrollbar-track { /* 滚动条轨迹 */
-  border-radius: 0;
-  background: rgb(56, 122, 209);
 }
 .area-title {
   color: rgb(73, 218, 170);
@@ -768,7 +759,7 @@ export default {
   cursor: pointer;
 }
 .bookmark-item:hover {
-  background: rgba(54, 54, 54, 0.801);
+  background: var(--downloader-bookmark-item-background-color);
 }
 .small-cover {
   width: 150px;

@@ -1,6 +1,6 @@
 <template>
   <div class="menu-container">
-    <a-menu style="width: 200px; background: rgb(41, 37, 37); height: calc(100vh - 30px);" mode="inline">
+    <a-menu style="width: 200px; height: calc(100vh - 30px);" mode="inline">
       <a-sub-menu key="sub1">
         <span slot="title">
           <span>LaityH ToDo</span>
@@ -75,5 +75,9 @@ export default {
 <style scoped>
 .menu-container {
   height: calc(100vh - 30px);
+  overflow-x: auto;
+}
+.menu-container::-webkit-scrollbar {
+  width: 0;
 }
 </style>

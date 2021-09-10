@@ -147,7 +147,8 @@
             })
         })
 
-        var dataPath = path.join(__dirname, './dataDir/todo.json') // 数据读取路径
+        var dataPath = path.join(process.cwd(), './dataDir/todo.json') // 数据读取路径
+        console.log(dataPath)
         function readFromFile(dataPath) {
             fs.readFile(dataPath, (err, data) => {
                 console.log(JSON.parse(data))

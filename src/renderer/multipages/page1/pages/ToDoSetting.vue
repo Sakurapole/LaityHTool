@@ -13,9 +13,16 @@
     <!-- 导出todo功能区 -->
     <div class="export-todo">
       <p class="fun-title">导出Todo文件</p>
-      <div class="export-area">
+      <div class="import-area">
         <a-tag color="#108ee9" class="export-tip">可导出的格式为：json</a-tag>
         <a-button type="default" class="export-btn" @click="exportTodo">导出</a-button>
+      </div>
+    </div>
+    <div class="import-todo">
+      <p class="fun-title">导入Todo文件</p>
+      <div class="export-area">
+        <a-tag color="#108ee9" class="import-tip">可导入的格式为：json</a-tag>
+        <a-button type="default" class="import-btn" @click="importTodo">导入</a-button>
       </div>
     </div>
     <!-- 选择颜色的drawer -->
@@ -78,6 +85,33 @@ export default {
           })
         })
       })
+    },
+    importTodo () {
+      dialog.showOpenDialog({
+        title: '导入Todo文件',
+        buttonLabel: '导入',
+        filters: [
+          {
+            name: 'json文件',
+            extensions: ['json']
+          }
+        ],
+        properties: ['openFile'],
+        message: '选择要导入的Todo文件'
+      }).then(res => {
+        console.log(res)
+        let filePath = res.filePaths[0] // 导入文件路径
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            let messageTip = new window.Notification('文件导入成功', {title: '文件导入失败', body: '文件路径：'+filePath})
+          }
+          let messageTip = new window.Notification('文件导入成功', {title: '文件导入成功', body: '导入路径：'+filePath})
+          let parseData = JSON.parse(data)
+          fs.writeFile(path.join(process.cwd(), './dataDir/todo.json'), JSON.stringify(parseData, "", "\t"), (err2) => {
+            if (err2) {console.log(err2)}
+          })
+        })
+      })
     }
   },
   created () {
@@ -115,21 +149,24 @@ export default {
   flex-direction: row;
   justify-content: flex-end;
 }
-.export-area {
+.export-todo, .import-todo {
+  margin-top: 10px;
+}
+.export-area, .import-area {
   width: 100%;
   /* height: 40px; */
   /* line-height: 40px; */
   display: flex;
   flex-direction: column;
 }
-.export-tip {
+.export-tip, .import-tip {
   width: 210px; 
   font-size: 16px; 
   text-align: center;
   margin-left: 10px;
   padding: 10px;
 }
-.export-btn {
+.export-btn, .import-btn {
   width: 100px;
   height: 40px;
   padding: 5px 0;

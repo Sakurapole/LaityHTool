@@ -9,14 +9,16 @@
   const fs = require("fs")
   const path = require("path")
 
+  const { ipcRenderer } = require('electron')
+
   export default {
     name: 'laityhtool',
     components: {
       WindowBorder: () => import('./components/WindowBorder')
     },
     created () {
-      console.log(this.$route)
-      console.log(path.join(process.cwd(), "./"))
+      // console.log(this.$route)
+      // console.log(path.join(process.cwd(), "./"))
       fs.readdir(path.join(process.cwd(), "./"), (err, files) => { // 读取是否存在数据目录
       console.log(files)
       if (files.indexOf('dataDir') == -1) { // 不存在数据目录时新建
@@ -68,6 +70,12 @@
           }
         })
       }
+      
+      window.addEventListener('keyup', function (e) {
+        if (e.code == 'Escape') {
+          ipcRenderer.send('esc')
+        }
+      })
     }
   }
 </script>
@@ -76,22 +84,32 @@
   /* CSS */
   #app {
     height: 100vh;
-    background: rgb(41, 37, 37);
+    background: var(--theme-background-color);
+  }
+  #app::-webkit-scrollbar {
+    width: 0;
   }
   .ant-menu-submenu-title {
     color: #1890ff;
   }
   .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
-    border-right: 1px solid rgb(83, 83, 83);
+    border-right: 1px solid var(--border-color);
   }
   .ant-menu .ant-menu-inline .ant-menu-sub {
-    background: rgb(41, 37, 37);
+    background-color: var(--theme-background-color) !important;
+  }
+  .ant-menu .ant-menu-inline .ant-menu-root .ant-menu-light {
+    background-color: var(--theme-background-color) !important;
   }
   .ant-menu-submenu > .ant-menu {
-    background: rgb(41, 37, 37);
+    background: var(--theme-background-color) !important;
+  }
+  .ant-menu {
+    /* 设置侧边栏主题色 */
+    background-color: var(--theme-background-color) !important;
   }
   .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-    background: rgb(65, 58, 58);
+    background: var(--index-menu-selected-background-color);
     color: #1890ff;
   }
   .ant-menu-item {
@@ -115,5 +133,17 @@
   }
   .ant-upload-list-item, .ant-upload-list-item-undefined, .ant-upload-list-item-list-type-text {
     display: none;
+  }
+  .ant-input {
+    background-color: var(--input-background-color);
+    border: 1px solid var(--input-background-color);
+  }
+  .ant-select-selection {
+    background-color: var(--input-background-color);
+    border: 1px solid var(--input-background-color);
+    color: var(--normal-text-color);
+  }
+  .ant-select-arrow {
+    color: var(--normal-text-color);
   }
 </style>

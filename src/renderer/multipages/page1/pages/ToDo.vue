@@ -15,7 +15,9 @@
             {{ item.title }}
           </a-tooltip>
         </div>
-        <div class="start-time">{{ item.time }}</div>
+        <div class="start-time">
+          {{ item.time }}
+        </div>
         <div class="condition-status" :class="judgeTodoStatus(item.conditionStatus)">{{ item.conditionStatus }}</div>
         <div class="func-btns" v-show="isShowFuncBtns(item)">
           <a-tooltip title="完成">
@@ -28,9 +30,32 @@
       </div>
       <div class="add-area" v-show="isSelected">
         <input type="text" v-model="inputTitle" placeholder="输入内容">
-        <input type="text" v-model="inputTime" placeholder="输入起始时间">
-        <input type="text" v-model="inputStatus" placeholder="状态">
-        <button @click="addItem">添加</button>
+        <!-- <input type="text" v-model="inputTime" placeholder="输入起始时间"> -->
+        <!-- <input type="text" v-model="inputStatus" placeholder="状态"> -->
+        <div class="add-area-last-row">
+          <a-date-picker @change="selectDate" style="width: 200px;" />
+          <a-select style="width: 160px;" placeholder="选择事件状态码" @change="selectInputStatus">
+            <a-select-option value="本日">
+              本日
+            </a-select-option>
+            <a-select-option value="本周">
+              本周
+            </a-select-option>
+            <a-select-option value="本月">
+              本月
+            </a-select-option>
+            <a-select-option value="紧急">
+              紧急
+            </a-select-option>
+            <a-select-option value="慢慢">
+              慢慢
+            </a-select-option>
+            <a-select-option value="其它">
+              其它
+            </a-select-option>
+          </a-select>
+          <button @click="addItem">添加</button>
+        </div>
       </div>
     </div>
     <div class="todo-btns">
@@ -71,7 +96,7 @@ export default {
       // hasDoneList: [], // 已完成列表
       isSelected: true, // 是否选中
       inputTitle: '', // 新增的标题
-      inputTime: '', // 新增的时间
+      inputTime: '', // 新增时间
       inputStatus: '', // 新增的状态
     }
   },
@@ -112,12 +137,16 @@ export default {
     judgeTodoStatus (status) {
       if (status == '紧急') {
         return 'urgent'
-      } else if (status == '当日') {
+      } else if (status == '本日') {
         return 'day-plan'
       } else if (status == '本周') {
         return 'week-plan'
-      } else if (status == '不急') {
+      } else if (status == '本月') {
+        return 'month-plan'
+      } else if (status == '慢慢') {
         return 'no-urgent'
+      } else if (status == '其它') {
+        return 'other'
       }
     },
     finishItem (index) { // 完成一个计划
@@ -170,6 +199,12 @@ export default {
           )
         }
       })
+    },
+    selectInputStatus (value) { // 选择todo状态码
+      this.inputStatus = value
+    },
+    selectDate (date, stringDate) { // 选择日期
+      this.inputTime = stringDate
     }
   },
   created () {
@@ -186,15 +221,22 @@ export default {
 .todo-container {
   height: calc(100vh - 30px);
   width: calc(100vw - 200px);
-  color: #ccc;
+  color: var(--normal-text-color);
   display: flex;
   flex-direction: row;
 }
 .todo-list {
   width: 450px;
   height: calc(100vh - 30px);
-  border-right: 1px solid rgba(184, 184, 184, 0.726);
+  border-right: 1px solid var(--border-color);
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+}
+.todo-list::-webkit-scrollbar {
+  width: 0;
 }
 .todo-btns {
   width: 150px;
@@ -205,13 +247,13 @@ export default {
   text-align: center;
   height: 50px;
   line-height: 50px;
-  background-color: rgba(27, 26, 26, 0.726);
+  background-color: var(--todo-func-btn-background-color);
   cursor: pointer;
   font-size: 20px;
   color: rgb(74, 101, 255);
 }
 :is(.upload-btn, .download-btn, .reload-btn, .start-btn):hover {
-  background-color: rgb(61, 61, 61);
+  background-color: var(--todo-func-btn-hover-background-color);
 }
 .switch-todo-list {
   width: 100%;
@@ -225,7 +267,7 @@ export default {
 .will-list-btn, .done-list-btn {
   height: 30px;
   line-height: 30px;
-  border: 1px solid rgb(80, 80, 80);
+  /* border: 1px solid rgb(80, 80, 80); */
   border-radius: 5px;
   margin-left: 10px;
   padding: 0 10px;
@@ -233,9 +275,9 @@ export default {
   transition: all 0.4s;
 }
 .switch-btn-selected {
-  background: rgba(0, 0, 0);
+  background: var(--todo-status-btn-selected);
 }
-.todo-item, .add-area {
+.todo-item {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -246,7 +288,7 @@ export default {
   transition: all 0.3s;
 }
 .todo-item:hover {
-  background: rgba(49, 48, 48, 0.753);
+  background: var(--todo-item-hover-background-color);
 }
 .todo-item .todo-title {
   width: 100px;
@@ -254,23 +296,24 @@ export default {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.add-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 95%;
+  margin: 10px 0;
+}
 .add-area input {
   height: 30px;
   line-height: 30px;
   outline: none;
   border: 0;
-  background: rgb(49, 49, 49);
+  background: var(--input-background-color);
   border-radius: 10px;
   text-align: center;
-}
-.add-area input:nth-child(1) {
-  width: 100px;
-}
-.add-area input:nth-child(2) {
-  width: 105px;
-}
-.add-area input:nth-child(3) {
-  width: 40px;
+  width: 100%;
 }
 .add-area button {
   outline: none;
@@ -279,13 +322,13 @@ export default {
   height: 30px;
   line-height: 30px;
   border-radius: 10px;
-  background: rgb(53, 52, 52);
+  background: var(--self-define-btn-background-color);
   padding: 5x;
   cursor: pointer;
   transition: all 0.4s;
 }
 .add-area button:hover {
-  background: rgb(77, 77, 77);
+  background: var(--self-define-btn-hover-background-color);
 }
 .urgent {
   color: red;
@@ -296,8 +339,14 @@ export default {
 .week-plan {
   color: rgb(0, 38, 255);
 }
+.month-plan {
+  color: rgb(4, 27, 156);
+}
 .no-urgent {
   color: rgb(80, 248, 103);
+}
+.other {
+  color: rgb(119, 118, 118);
 }
 .finish-btn {
   cursor: pointer;
