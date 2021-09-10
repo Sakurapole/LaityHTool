@@ -1,6 +1,6 @@
 <template>
-  <div>
-    123
+  <div class="fast-note-container">
+    
   </div>
 </template>
 
@@ -12,11 +12,13 @@ export default {
     }
   },
   methods: {
-  
+
+  },
+  components: {
+
+  },
+  created() {
+
   }
 }
 </script>
-
-<style scoped>
-
-</style>

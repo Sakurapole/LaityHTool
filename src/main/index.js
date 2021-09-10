@@ -5,7 +5,8 @@ import {
         Tray, 
         Menu, 
         session,
-        globalShortcut
+        globalShortcut,
+        dialog
       } from 'electron'
 import '../renderer/store'
 
@@ -20,13 +21,19 @@ if (process.env.NODE_ENV !== 'development') { // 检测环境
 }
 
 let mainWindow // 主窗口
+let funcWindow = null // 功能窗口
 let tray // 托盘
 let todoWindow // to do 窗口
 let todoIsIgnored = false // 是否开启鼠标穿透
+let about = null // 关于窗口
 
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080/page1.html`
   : `file://${__dirname}/page1.html`
+
+const funcURL = process.env.NODE_ENV === 'development'
+? `http://localhost:9080/page2.html`
+: `file://${__dirname}/page2.html`
 
 const trayMenu = Menu.buildFromTemplate([ // 托盘菜单
   {
@@ -37,7 +44,13 @@ const trayMenu = Menu.buildFromTemplate([ // 托盘菜单
   {
     label: '关于',
     click: () => {
-
+      dialog.showMessageBox({
+        message: '作者：LaityH制作\n\n邮箱：\n1831495788@qq.com\n',
+        type: 'info',
+        // buttons: ['确认'],
+        title: "关于",
+        detail: 'github地址：\nhttps://github.com/Sakurapole/LaityHTool'
+      })
     }
   },
   {
@@ -61,13 +74,43 @@ const trayMenu = Menu.buildFromTemplate([ // 托盘菜单
           openAtLogin: !app.getLoginItemSettings().openAtLogin
         })
       }
-      console.log(app.getLoginItemSettings().openAtLogin)
-      console.log(!app.isPackaged);
+      // console.log(app.getLoginItemSettings().openAtLogin)
+      // console.log(!app.isPackaged);
     }
   }
 ])
 
 const exeName = path.basename(process.execPath)
+
+function createFuncWindow() { // 创建功能窗口
+  funcWindow = new BrowserWindow({
+    width: 300,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true, // 打开remote模块
+      contextIsolation: false,
+      webSecurity: false
+    },
+    alwaysOnTop: true,
+    resizable: false,
+    // useContentSize: true,
+    frame: false // 去除原有边框
+  })
+
+  funcWindow.on('closed', () => { // 窗口关闭即销毁
+    funcWindow = null
+  })
+
+  // funcWindow.on('move', () => {
+  //   console.log(funcWindow.getPosition());
+  //   if (funcWindow.getPosition()[1] == 0) {
+  //     funcWindow.setSize(300, 1)
+  //   }
+  // })
+
+  funcWindow.loadURL(funcURL)
+}
 
 function createWindow () { // 创建主窗口
   /**
@@ -98,12 +141,24 @@ function createWindow () { // 创建主窗口
     mainWindow = null
   })
 
-  const ret = globalShortcut.register('CommandOrControl+Shift+Q', () => {
+  const showRet = globalShortcut.register('CommandOrControl+Shift+Q', () => {
     mainWindow.show()
   })
 
-  if(!ret) {
+  if(!showRet) {
     console.log("registration failed")
+  }
+
+  const showFuncWindowRet = globalShortcut.register('CommandOrControl+Shift+M', () => {
+    if (funcWindow === null) {
+      createFuncWindow()
+    } else {
+      funcWindow.show()
+    }
+  })
+
+  if (!showFuncWindowRet) {
+    console.log("窗口创建失败")
   }
 
   // console.log(globalShortcut.isRegistered('CommandOrControl+Shift+Q'))
@@ -161,6 +216,14 @@ ipcMain.on('closeWindow', () => { // 监听隐藏主窗口事件
   }
 })
 
+ipcMain.on('minFuncWindow', () => { // 最小化funcWindow
+  funcWindow.minimize()
+})
+
+ipcMain.on('closeFuncWindow', () => { // 隐藏funcWindow
+  funcWindow.hide()
+})
+
 ipcMain.on('startTodo', (e, options) => { // 开启Todo的桌面置顶模式
   console.log(options);
   if (todoWindow) { // 判断是否存在todoWindow
@@ -204,9 +267,27 @@ ipcMain.on('setCookie', (e, options) =>{
   })
 })
 
-ipcMain.on('esc', (e) => {
+ipcMain.on('esc', (e) => { // 监听隐藏主窗口消息
   if(mainWindow) {
     mainWindow.hide()
+  }
+})
+
+ipcMain.on('openFuncWindow', (e) => { // 打开FuncWindow
+  if (funcWindow === null) {
+    createFuncWindow()
+  } else {
+    funcWindow.show()
+  }
+})
+
+ipcMain.on('funcEsc', (e) => { // 隐藏funcWindow
+  funcWindow.hide()
+})
+
+ipcMain.on('switch-theme', (e, value) => {
+  if (funcWindow) {
+    funcWindow.webContents.send('switch-theme', value)
   }
 })
 

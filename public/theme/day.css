@@ -14,4 +14,6 @@
     --input-background-color: #fff;
     --self-define-btn-background-color: rgb(255, 255, 255);
     --self-define-btn-hover-background-color: rgb(206, 206, 206);
+    --funcs-hover-background-color: rgb(240, 219, 219);
+    --funcs-hover-text-color: rgb(62, 137, 187);
 }

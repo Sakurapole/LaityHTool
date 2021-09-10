@@ -3,6 +3,9 @@
     <div class="app-title">
       LaityHTool
     </div>
+    <div class="all-func-button" @click="openFuncWindow">
+      功能窗口
+    </div>
     <div class="switch-theme">
       <!-- <a-switch class="switch-theme-button" @change="switchTheme" default-checked></a-switch> -->
       <a-select default-value="night" style="width: 120px;" @change="switchTheme">
@@ -33,6 +36,7 @@ export default {
   methods: {
     switchTheme (value) { // 切换主题
       console.log(value)
+      ipcRenderer.send('switch-theme', value)
       document.head.querySelector('#skin').setAttribute('href',`/public/theme/${value}.css`)
     },
     minWindow () {
@@ -40,6 +44,9 @@ export default {
     },
     closeWindow () {
       ipcRenderer.send('closeWindow')
+    },
+    openFuncWindow () { // 打开功能窗口
+      ipcRenderer.send('openFuncWindow')
     }
   }
 }
@@ -64,6 +71,22 @@ export default {
   text-align: center;
   font-size: 16px;
   color: var(--normal-text-color);
+}
+.all-func-button {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  margin-right: 20px;
+  color: var(--normal-text-color);
+  /* border: 1px solid var(--normal-text-color); */
+  background-color: var(--self-define-btn-background-color);
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  border-radius: 5px;
+  transition: all .4s;
+}
+.all-func-button:hover {
+  border-bottom: 15px solid rgb(95, 144, 235);
 }
 .switch-theme {
   display: flex;

@@ -9,11 +9,16 @@ export default new Router({
     {
       path: '/',
       name: 'index',
-      component: () => import('../pages/test')
+      component: () => import('../pages/index.vue')
     },
     {
       path: '*',
       redirect: '/'
+    },
+    {
+      path: '/fastNote',
+      name: 'fastNote',
+      component: () => import('../pages/fastNote.vue')
     }
   ]
 })
